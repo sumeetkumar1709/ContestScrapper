@@ -20,7 +20,7 @@ function delay(time) {
  }
 const url='https://www.codechef.com/contests?itm_medium=navmenu&itm_campaign=allcontests';
 
-let json={};
+let json;
 
 async function codechef(){
 
@@ -35,7 +35,6 @@ async function codechef(){
         ignoreHTTPSErrors: true,
         };
     }
-
 
     const browser = await puppeteer.launch(options);
     const page = await browser.newPage();
@@ -88,20 +87,22 @@ async function codechef(){
         obj[`${i}`]={...cur};
     }
     json={...obj}
-    //console.log(json);
+       
+    
 }
 
-
-codechef();
 
 app.get('/', (req, res)=>{
     res.send("Welcome to contest webscraper!!!");
 });
 
-
 app.get('/codechef', async(req, res)=>{
-    res.send(json);
-});
+    await codechef();
+    res.send(json)
+}); 
 
 app.listen(process.env.PORT || PORT,()=>{console.log(`listening on port ${PORT}`)});
 
+
+
+// vercel --prod --force
