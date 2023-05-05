@@ -1,6 +1,16 @@
 const cheerio = require('cheerio');
 const express = require('express');
-const puppeteer=require('puppeteer');
+let chrome = {};
+let puppeteer;
+
+if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
+  chrome = require("chrome-aws-lambda");
+  puppeteer = require("puppeteer-core");
+} else {
+  puppeteer = require("puppeteer");
+}
+
+
 const app = express();
 const PORT = 8000;
 function delay(time) {
@@ -13,7 +23,21 @@ const url='https://www.codechef.com/contests?itm_medium=navmenu&itm_campaign=all
 let json={};
 
 async function codechef(){
-    const browser = await puppeteer.launch();
+
+    let options = {};
+
+    if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
+        options = {
+        args: [...chrome.args, "--hide-scrollbars", "--disable-web-security"],
+        defaultViewport: chrome.defaultViewport,
+        executablePath: await chrome.executablePath,
+        headless: true,
+        ignoreHTTPSErrors: true,
+        };
+    }
+
+
+    const browser = await puppeteer.launch(options);
     const page = await browser.newPage();
     await page.goto(url);
     await page.setViewport({width: 1080, height: 1024});
@@ -70,9 +94,14 @@ async function codechef(){
 
 codechef();
 
-app.get('/codechef', (req, res)=>{
+app.get('/', (req, res)=>{
+    res.send("Welcome to contest webscraper!!!");
+});
+
+
+app.get('/codechef', async(req, res)=>{
     res.send(json);
 });
 
-app.listen(PORT,()=>{console.log(`listening on port ${PORT}`)});
+app.listen(process.env.PORT || PORT,()=>{console.log(`listening on port ${PORT}`)});
 
