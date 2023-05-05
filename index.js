@@ -93,7 +93,7 @@ async function codechef(){
 
 
 app.get('/', (req, res)=>{
-    res.send("Welcome to contest webscraper!!!");
+    res.send("Welcome to contest webscraper!!!\n\n 1. Move to  /codechef for data codechef.com");
 });
 
 app.get('/codechef', async(req, res)=>{
