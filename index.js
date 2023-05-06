@@ -1,7 +1,18 @@
 const cheerio = require('cheerio');
 const express = require('express');
+const axios = require('axios');
 let chrome = {};
 let puppeteer;
+
+function delay(time) {
+    return new Promise(function(resolve) { 
+        setTimeout(resolve, time)
+    });
+ }
+
+
+/**  this condition is necessary for the puppeteer to work on production and development
+ *  with different dependencies required */
 
 if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
   chrome = require("chrome-aws-lambda");
@@ -13,19 +24,15 @@ if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
 
 const app = express();
 const PORT = 8000;
-function delay(time) {
-    return new Promise(function(resolve) { 
-        setTimeout(resolve, time)
-    });
- }
-const url='https://www.codechef.com/contests?itm_medium=navmenu&itm_campaign=allcontests';
 
-let json;
+
+
+let codechefjson;
 
 async function codechef(){
 
     let options = {};
-
+    const url='https://www.codechef.com/contests?itm_medium=navmenu&itm_campaign=allcontests';
     if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
         options = {
         args: [...chrome.args, "--hide-scrollbars", "--disable-web-security"],
@@ -86,20 +93,56 @@ async function codechef(){
         j+=2;
         obj[`${i}`]={...cur};
     }
-    json={...obj}
+    codechefjson={...obj}
        
     
 }
 
+let codeforcesjson={};
+async function codeforces(){
+    const url = 'https://codeforces.com/api/contest.list?';
+     await axios
+    .get(url)
+    .then(response => {
+      //console.log(response.data.result[0].id);
+      let temp = response.data.result;
+      var k=0;
+      for(var i=0;i<temp.length;i++){
+        if(temp[i].phase==="BEFORE"){
+            codeforcesjson[k++] = temp[i];
+        }
+      }
+      
+    })
+    .catch(error => {
+      console.log(error);
+    }); 
+    
+}
+
+
+
+
+
+
+
+
+
 
 app.get('/', (req, res)=>{
-    res.send("Welcome to contest webscraper!!!\n\n 1. Move to  /codechef for data codechef.com");
+    res.send("Welcome to webscrapping API for coding contests");
 });
 
 app.get('/codechef', async(req, res)=>{
     await codechef();
-    res.send(json)
+    res.send(codechefjson)
 }); 
+
+
+app.get('/codeforces', async(req, res)=>{
+    await codeforces();
+    res.send(codeforcesjson);
+});
 
 app.listen(process.env.PORT || PORT,()=>{console.log(`listening on port ${PORT}`)});
 
