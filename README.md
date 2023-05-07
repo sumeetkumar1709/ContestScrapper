@@ -46,6 +46,7 @@ The API provides the following endpoints:
 
 - `GET /codechef`: Retrieves a list of upcoming coding contests from codechef.
 - `GET /codeforces`: Retrieves a list of upcoming coding contests from codeforces.
+- `GET /atcoder`: Retrieves a list of upcoming coding contests from codeforces.
 
 ## Response Format
 
@@ -149,4 +150,44 @@ The API provides the following endpoints:
     }
 }
 ```
+3. '/atcoder'
 
+```json
+{
+    "0": {
+        "contestname": "パナソニックグループプログラミングコンテスト2023（AtCoder Beginner Contest 301）",
+        "starttime": "2023-05-13(Sat) 12:00",
+        "duration": "01:40",
+        "ratedfor": " - 1999"
+    },
+    "1": {
+        "contestname": "AtCoder Regular Contest 160",
+        "starttime": "2023-05-14(Sun) 12:00",
+        "duration": "02:00",
+        "ratedfor": " - 2799"
+    },
+    "2": {
+        "contestname": "AtCoder Grand Contest 062",
+        "starttime": "2023-05-21(Sun) 12:00",
+        "duration": "03:00",
+        "ratedfor": "1200 - "
+    },
+    "3": {
+        "contestname": "日鉄ソリューションズプログラミングコンテスト2023（AtCoder Beginner Contest 303）",
+        "starttime": "2023-05-27(Sat) 12:00",
+        "duration": "01:40",
+        "ratedfor": " - 1999"
+    },
+    "4": {
+        "contestname": "AtCoder Regular Contest 161",
+        "starttime": "2023-05-28(Sun) 12:00",
+        "duration": "02:00",
+        "ratedfor": " - 2799"
+    },
+    "5": {
+        "contestname": "ALGO ARTIS Programming Contest 2023（AtCoder Heuristic Contest 020）",
+        "starttime": "2024-04-23(Tue) 06:00",
+        "duration": "04:00",
+        "ratedfor": "All"
+    }
+} ```
