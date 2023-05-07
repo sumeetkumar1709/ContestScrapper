@@ -150,7 +150,7 @@ The API provides the following endpoints:
     }
 }
 ```
-3. '/atcoder'
+3. `/atcoder`
 
 ```json
 {
@@ -190,4 +190,5 @@ The API provides the following endpoints:
         "duration": "04:00",
         "ratedfor": "All"
     }
-} ```
+} 
+```
