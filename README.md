@@ -7,8 +7,7 @@ This project is an API that scrapes data from different coding contests and prov
 - [Usage](#usage)
 - [Endpoints](#endpoints)
 - [Response Format](#response-format)
-- [Contributing](#contributing)
-- [License](#license)
+
 
 ## Installation
 
