@@ -28,7 +28,6 @@ const PORT = 8000;
 
 
 let codechefjson;
-
 async function codechef(){
 
     let options = {};
@@ -123,9 +122,6 @@ async function codeforces(){
 
 
 let atcoderjson={};
-
-
-
 async function atcoder(){
   let options = {};
   const url='https://atcoder.jp/contests/';

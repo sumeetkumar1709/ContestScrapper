@@ -24,13 +24,13 @@ function delay(time) {
 const app = express();
 const PORT = 3000;
 
-let atcoderjson={};
+let leetcodejson={};
 
 
 
-async function atcoder(){
+async function leetcode(){
   let options = {};
-  const url='https://atcoder.jp/contests/';
+  const url='https://leetcode.com/contest/';
   if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
       options = {
       args: [...chrome.args, "--hide-scrollbars", "--disable-web-security"],
@@ -50,76 +50,27 @@ async function atcoder(){
   //console.log(bodyHTML);
   await browser.close();
 
-  let html=bodyHTML;
-    $ = cheerio.load(html)
-    let i=0;
-    let table
-    $('table',html).each(function(){
-        let temp=$(this).html()
-        if(i===1){
-           table =temp;
-        }
-        i+=1; 
-    });
+  let html = bodyHTML;
 
-    $ = cheerio.load(table);
-    let names=[];
-    i=0;
-    var k=0;
-    $('td a',table).each(function(){
-        if(i%2===1){
-          names[k++]=$(this).html();
-        }
-        i++;
-    });
-    //console.log(names);
-    
-    let times=[];
-    i=0;
-    $('td a time',table).each(function(){
-          times[i++]=$(this).html();
-    });
-    //console.log(times);
+  $ = cheerio.load(html);
+  let i=0;
+  let swiper;
+  $('.swiper-wrapper',html).each(function(){
+    if(i===0){
+      swiper=$(this).html(); 
+    }
+    i++;
+  });
+  //console.log(swiper);
+  $ = cheerio.load(swiper);
+  $('.px-4',swiper).each(function(){
+    console.log($(this).html());
+  });
 
-    let td = [];
-    i=0;
-    $('.text-center',table).each(function(){
-      td[i++]=$(this).html();
-    });
-    
-    i
-    let temp=1;
-    let info=[];
-    let j=0;
-    for(let i=5; i<td.length; i++){
-      if(temp===3){
-        temp=1;
-      }
-      else{
-        info[j++]=td[i];
-        temp++;
-      }
-      
-    }
-    let obj=[];
-    i=0;
-    for(var t=0; t<names.length;t++){
-        let cur=[];
-        cur['contestname']=names[t];
-        cur['starttime']=times[t];
-        cur['duration'] = info[i];
-        i++;
-        cur['ratedfor']=info[i];
-        i++;
-        obj[`${t}`]={...cur};
-    }
-    
-    //console.log(obj);
-    atcoderjson = {...obj};
-    //console.log(atcoderjson);
 }
 
 
+leetcode();
 
 
 app.get('/', (req, res)=>{
@@ -127,9 +78,9 @@ app.get('/', (req, res)=>{
 });
 
 
-app.get('/atcoder', async(req, res)=>{
-    await atcoder();
-    res.send(atcoderjson);
+app.get('/leetcode', async(req, res)=>{
+    //await leetcode();
+    res.send("Leetcode");
 });
 
 app.listen(process.env.PORT || PORT,()=>{console.log(`listening on port ${PORT}`)});
