@@ -45,7 +45,8 @@ The API provides the following endpoints:
 
 - `GET /codechef`: Retrieves a list of upcoming coding contests from codechef.
 - `GET /codeforces`: Retrieves a list of upcoming coding contests from codeforces.
-- `GET /atcoder`: Retrieves a list of upcoming coding contests from codeforces.
+- `GET /atcoder`: Retrieves a list of upcoming coding contests from atcoder.
+- `GET /leetcode`: Retrieves a list of upcoming coding contests from leetcode.
 
 ## Response Format
 

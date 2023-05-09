@@ -280,10 +280,10 @@ async function leetcode(){
 
 
 
-
+app.use(express.static(__dirname+"/public"));
 
 app.get('/', (req, res)=>{
-    res.send("Welcome to webscrapping API for coding contests");
+    res.sendFile(__dirname + "/public/" + "index.html");
 });
 
 app.get('/codechef', async(req, res)=>{
