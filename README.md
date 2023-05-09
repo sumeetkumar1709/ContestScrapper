@@ -192,7 +192,7 @@ The API provides the following endpoints:
 } 
 ```
 
-3. `/leetcode`
+4. `/leetcode`
 
 ```json
     {
