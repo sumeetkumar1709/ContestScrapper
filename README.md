@@ -191,3 +191,20 @@ The API provides the following endpoints:
     }
 } 
 ```
+
+3. `/leetcode`
+
+```json
+    {
+        "0":
+            {   
+                "contestname":"Weekly Contest 345",
+                "time":"Sunday 2:30 AM UTC"
+            },
+        "1":
+            {   
+                "contestname":"Biweekly Contest 104",
+                "time":"Saturday 2:30 PM UTC"
+            }
+    }
+```

@@ -26,8 +26,6 @@ const PORT = 3000;
 
 let leetcodejson={};
 
-
-
 async function leetcode(){
   let options = {};
   const url='https://leetcode.com/contest/';
@@ -62,15 +60,36 @@ async function leetcode(){
     i++;
   });
   //console.log(swiper);
+  let contests=[];
   $ = cheerio.load(swiper);
-  $('.px-4',swiper).each(function(){
-    console.log($(this).html());
+  i=0;
+  $('.px-4 .font-medium span',swiper).each(function(){
+    contests[i++]=$(this).html();
   });
 
+  let time=[];
+  i=0;
+  $('.px-4 .text-label-2',swiper).each(function(){
+    time[i++]=$(this).html();
+  });
+
+  // console.log(time,contests);
+
+  obj=[];
+
+  for(let j=0;j<contests.length;j++){
+    cur=[];
+    cur['contestname'] = contests[j];
+    cur['time'] = time[j];
+    obj[`${j}`] = {...cur};
+  }
+
+  leetcodejson={...obj};
+  console.log(leetcodejson);
 }
 
 
-leetcode();
+
 
 
 app.get('/', (req, res)=>{
@@ -79,8 +98,8 @@ app.get('/', (req, res)=>{
 
 
 app.get('/leetcode', async(req, res)=>{
-    //await leetcode();
-    res.send("Leetcode");
+    await leetcode();
+    res.send(leetcodejson);
 });
 
 app.listen(process.env.PORT || PORT,()=>{console.log(`listening on port ${PORT}`)});
