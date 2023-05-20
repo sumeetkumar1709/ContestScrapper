@@ -1,8 +1,12 @@
 const cheerio = require('cheerio');
 const express = require('express');
 const axios = require('axios');
+const cache = require('node-cache')
+
 let chrome = {};
 let puppeteer;
+
+let mycache = new cache();
 
 function delay(time) {
     return new Promise(function(resolve) { 
@@ -10,6 +14,16 @@ function delay(time) {
     });
  }
 
+
+function secondsUntilEndOfDay(){
+  var d = new Date();
+  var h = d.getHours();
+  var m = d.getMinutes();
+  var s = d.getSeconds();
+  var secondsUntilEndOfDate = (24*60*60) - (h*60*60) - (m*60) - s;
+
+  return secondsUntilEndOfDate;
+}
 
 /**  this condition is necessary for the puppeteer to work on production and development
  *  with different dependencies required */
@@ -275,7 +289,6 @@ async function leetcode(){
   }
 
   leetcodejson={...obj};
-  console.log(leetcodejson);
 }
 
 
@@ -287,24 +300,52 @@ app.get('/', (req, res)=>{
 });
 
 app.get('/codechef', async(req, res)=>{
-    await codechef();
-    res.send(codechefjson)
+    if(mycache.has('codechef')){
+        return res.send(mycache.get('codechef'));
+    }
+    else{
+      await codechef();
+      mycache.set('codechef',codechefjson,[secondsUntilEndOfDay()]);
+      res.send(codechefjson)
+    }
+    
 }); 
 
 
 app.get('/codeforces', async(req, res)=>{
-    await codeforces();
-    res.send(codeforcesjson);
+    if(mycache.has('codeforces')){
+      return res.send(mycache.get('codeforces'));
+    }
+    else{
+      await codeforces();
+      mycache.set('codeforces',codeforcesjson,[secondsUntilEndOfDay()]);
+      res.send(codeforcesjson);
+    }
+
 });
 
 app.get('/atcoder', async(req, res)=>{
-    await atcoder();
-    res.send(atcoderjson);
+    if(mycache.has('atcoder')){
+      return res.send(mycache.get('atcoder'));
+    }
+    else{
+      await atcoder();
+      mycache.set('atcoder',atcoderjson,[secondsUntilEndOfDay()]);
+      res.send(atcoderjson);
+    }
+    
 });
 
 app.get('/leetcode', async(req, res)=>{
-  await leetcode();
-  res.send(leetcodejson);
+  if(mycache.has('leetcode')){
+    return res.send(mycache.get('leetcode'));
+  }
+  else{
+    await leetcode();
+    mycache.set('leetcode',leetcodejson,[secondsUntilEndOfDay()]);
+    res.send(leetcodejson);
+  }
+  
 });
 
 app.listen(process.env.PORT || PORT,()=>{console.log(`listening on port ${PORT}`)});
