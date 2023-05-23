@@ -2,11 +2,45 @@ const cheerio = require('cheerio');
 const express = require('express');
 const axios = require('axios');
 const cache = require('node-cache')
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+const schema=require('./schema')
+
+
+dotenv.config()
+
+// DataBase Connection To MongoDB
+const uri = process.env.MONGO_URI;
+mongoose.connect(
+  uri, 
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  }
+);
+
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "connection error: "));
+db.once("open", function () {
+  console.log("Connected successfully");
+});
+
+
+
+const codechefcollection = mongoose.model("codechefcontest",schema.CodechefSchema);
 
 let chrome = {};
 let puppeteer;
 
 let mycache = new cache();
+
+/** Helper Functions */
+
+
+async function getdata(collection){
+    const data = await collection.find({});
+    return data;
+}
 
 function delay(time) {
     return new Promise(function(resolve) { 
@@ -14,6 +48,10 @@ function delay(time) {
     });
  }
 
+function getDay(){
+  var d = new Date();
+  return d.getDate();
+}
 
 function secondsUntilEndOfDay(){
   var d = new Date();
@@ -104,9 +142,9 @@ async function codechef(){
         cur['time']=ptag[j++];
         cur['duration']=ptag[j++];
         j+=2;
-        obj[`${i}`]={...cur};
+        obj[i]=cur;
     }
-    codechefjson={...obj}
+    codechefjson=obj;
        
     
 }
@@ -247,7 +285,7 @@ async function leetcode(){
   const page = await browser.newPage();
   await page.goto(url);
   await page.setViewport({width: 1080, height: 1024});
-  await delay(4000);
+  //await delay(2000);
   bodyHTML = await page.evaluate(() =>  document.documentElement.outerHTML);
   //console.log(bodyHTML);
   await browser.close();
@@ -294,21 +332,78 @@ async function leetcode(){
 
 
 app.use(express.static(__dirname+"/public"));
+app.use(express.json());
+
+
+
+app.post('/codechef',async(req,res)=>{
+  console.log("|---- POST COODECHEF REQUEST ----|");
+  data= await getdata(codechefcollection);
+  var refresh=null;
+  var ack=false;
+  console.log(ack)
+  if(data.length>0){  
+      refresh=data[0].refreshdate;
+      var cur = getDay();
+      if(cur!=refresh){
+        ack=true;
+      }
+      console.log(ack)
+  }
+  else{
+    ack=true;
+  }
+  console.log(ack);
+  if(ack){
+    await codechefcollection.deleteMany({})
+    .then((r)=>{console.log("Success Deletion")})
+    .catch((err)=>{
+        console.log(err)
+    })
+    await codechef();
+    for(var i=0; i<codechefjson.length;i++){
+        data = new codechefcollection({
+          contestcode:codechefjson[i].contestcode,
+          contestname:codechefjson[i].contestname,
+          date:codechefjson[i].date,
+          time:codechefjson[i].time,
+          duration:codechefjson[i].duration,
+          refreshdate:getDay(),
+        })
+
+        state = await data.save().catch(err =>{
+          if(err){
+            console.log(`Error in updating db`)
+          }
+          else{
+            console.log(`record updated successfully`);
+          }
+        })
+    }
+  }
+
+  res.send("Success!!!!");
+})
+
+
 
 app.get('/', (req, res)=>{
     res.sendFile(__dirname + "/public/" + "index.html");
 });
 
 app.get('/codechef', async(req, res)=>{
-    if(mycache.has('codechef')){
-        return res.send(mycache.get('codechef'));
+    data= await getdata(codechefcollection);
+    obj=[];
+    for(var i=0; i<data.length; i++){
+      cur=[];
+      cur['contestcode']=data[i].contestcode;
+      cur['contestname']=data[i].contestname;
+      cur['date']=data[i].date;
+      cur['time']=data[i].time;
+      cur['duration']=data[i].duration;
+      obj[`${i}`]={...cur};
     }
-    else{
-      await codechef();
-      mycache.set('codechef',codechefjson,[secondsUntilEndOfDay()]);
-      res.send(codechefjson)
-    }
-    
+    res.send({...obj});
 }); 
 
 
