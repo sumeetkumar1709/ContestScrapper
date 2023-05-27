@@ -51,8 +51,11 @@ function delay(time) {
  }
 
 function getDay(){
-  var d = new Date();
-  return d.getDate();
+  const date = new Date();
+  var ISToffSet = 330;
+  offset= ISToffSet*60*1000;
+  var ISTTime = new Date(date.getTime()+offset);
+  return ISTTime.getDate();
 }
 
 function secondsUntilEndOfDay(){
